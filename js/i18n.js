@@ -38,6 +38,7 @@ window.TEXTOS = {
       "footer.trazabilidad": "Trazabilidad",
       "footer.desc": "Café de origen colombiano, directo de la finca a tu pedido. Del surco a tu taza.",
       "footer.hechoEn": "Hecho en Colombia",
+      "footer.legal": "Legal",
       "footer.privacidad": "Política de Privacidad",
       "footer.tratamiento": "Tratamiento de Datos",
 
@@ -98,6 +99,7 @@ window.TEXTOS = {
       "footer.trazabilidad": "Traceability",
       "footer.desc": "Coffee of Colombian origin, straight from the farm to your order. From the furrow to your cup.",
       "footer.hechoEn": "Made in Colombia",
+      "footer.legal": "Legal",
       "footer.privacidad": "Privacy Policy",
       "footer.tratamiento": "Data Processing",
 
