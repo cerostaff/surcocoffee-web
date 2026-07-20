@@ -9,7 +9,9 @@ y sube el cambio (o pídelo). Ejemplos:
 
 - **Precios:** en `productos` → `precios`. Ej. `"250": 25000` (sin puntos ni `$`).
 - **Textos de un café:** `descripcion` y `ficha` (variedad, altura, proceso, sca).
-- **Número de WhatsApp:** `whatsapp` (formato internacional, sin `+`, ej. `573332485064`).
+- **Número de WhatsApp:** `whatsapp` (número real usado para enlaces y el checkout; formato
+  internacional, sin `+`, ej. `573332485064`) y `whatsappDisplay` (el texto legible que se
+  muestra en la página, ej. `(+57) 333 2485064`).
 - **Redes y correo:** `instagram`, `facebook`, `email`, `ubicacion`.
 - **Fotos del inicio (carrusel):** `hero.slides` (rutas dentro de `assets/img/`).
 

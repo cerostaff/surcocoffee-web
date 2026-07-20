@@ -22,7 +22,7 @@ const chipUnsel = 'background:#fff;color:var(--color-text);border:1px solid var(
 function productCard(p) {
   const sizes = CFG.tamanos;
   const sel = state.sel[p.id];
-  const price = p.precios[sizes[sel].id];
+  const price = p.precios[sizes[sel].id] ?? 0;
 
   const media = p.imagen
     ? `<img src="${p.imagen}" alt="Bolsa Surco ${p.titulo}" style="width:100%; height:100%; object-fit:cover;">`
@@ -38,9 +38,9 @@ function productCard(p) {
       <span style="display:block; font-size:11px; opacity:.8;">${s.peso}</span>
     </button>`).join('');
 
-  const f = p.ficha;
+  const f = p.ficha || {};
   const fichaCell = (label, val) =>
-    `<div><div style="font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--color-accent-2-800); margin-bottom:2px;">${label}</div><div style="font-family:var(--font-heading); font-size:15px;">${val}</div></div>`;
+    `<div><div style="font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--color-accent-2-800); margin-bottom:2px;">${label}</div><div style="font-family:var(--font-heading); font-size:15px;">${val || '—'}</div></div>`;
 
   return `
   <div style="flex:1 1 300px; min-width:0; background:#fff; border-radius:var(--radius-lg); padding:18px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:15px;">
@@ -129,13 +129,25 @@ function renderSlide() {
 }
 function goSlide(i) { state.slide = (i + CFG.hero.slides.length) % CFG.hero.slides.length; renderSlide(); }
 
+// ============ CONTACTO ============
+function initContacts() {
+  const wa = `https://wa.me/${CFG.whatsapp}`;
+  document.querySelectorAll('[data-wa-link]').forEach((a) => { a.href = wa; });
+  const set = (id, fn) => { const el = $(id); if (el) fn(el); };
+  set('link-ig', (el) => { el.href = CFG.instagram; });
+  set('link-fb', (el) => { el.href = CFG.facebook; });
+  set('footer-wa', (el) => { el.href = wa; el.textContent = 'WhatsApp ' + CFG.whatsappDisplay; });
+  set('footer-email', (el) => { el.textContent = CFG.email; });
+  set('footer-ubicacion', (el) => { el.textContent = CFG.ubicacion; });
+}
+
 // ============ ACCIONES ============
 function refreshAll() { renderCatalogo(); renderCartBadge(); renderCartPanel(); }
 
 function onAdd(prodId) {
   const p = CFG.productos.find((x) => x.id === prodId);
   const size = CFG.tamanos[state.sel[prodId]];
-  const withPrice = { ...p, price: p.precios[size.id] };
+  const withPrice = { ...p, price: p.precios[size.id] ?? 0 };
   state.cart = addItem(state.cart, withPrice, size);
   state.done = false;
   state.cartOpen = true;
@@ -144,6 +156,7 @@ function onAdd(prodId) {
 function onSelectSize(prodId, i) { state.sel[prodId] = i; renderCatalogo(); }
 function onQty(key, delta) { state.cart = changeQty(state.cart, key, delta); state.done = false; renderCartBadge(); renderCartPanel(); }
 function onToggleCart() { state.cartOpen = !state.cartOpen; renderCartPanel(); }
+function closeCart() { if (state.cartOpen) { state.cartOpen = false; renderCartPanel(); } }
 function onCheckout() {
   if (!state.cart.length) return;
   window.open(waLink(CFG.whatsapp, buildOrderMessage(state.cart)), '_blank');
@@ -158,11 +171,19 @@ document.addEventListener('click', (e) => {
   if (btn && (e.target === btn || btn.contains(e.target))) { onToggleCart(); return; }
   if ($('cart-close') && ($('cart-close') === e.target || $('cart-close').contains(e.target))) { onToggleCart(); return; }
   if ($('cart-checkout') && ($('cart-checkout') === e.target || $('cart-checkout').contains(e.target))) { onCheckout(); return; }
+  if (state.cartOpen) {
+    const panel = $('cart-panel');
+    const insidePanel = panel && panel.contains(e.target);
+    if (!insidePanel) closeCart();
+  }
   if (!t) return;
   if (t.hasAttribute('data-add')) onAdd(t.getAttribute('data-prod'));
   else if (t.hasAttribute('data-add-size')) onSelectSize(t.getAttribute('data-prod'), Number(t.getAttribute('data-size')));
   else if (t.hasAttribute('data-qty')) onQty(t.getAttribute('data-qty'), Number(t.getAttribute('data-delta')));
   else if (t.hasAttribute('data-dot')) goSlide(Number(t.getAttribute('data-dot')));
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeCart();
 });
 $('hero-prev').addEventListener('click', () => goSlide(state.slide - 1));
 $('hero-next').addEventListener('click', () => goSlide(state.slide + 1));
@@ -170,4 +191,5 @@ $('hero-next').addEventListener('click', () => goSlide(state.slide + 1));
 // ============ INICIO ============
 refreshAll();
 renderSlide();
+initContacts();
 setInterval(() => goSlide(state.slide + 1), CFG.hero.intervaloMs);

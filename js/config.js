@@ -6,6 +6,7 @@
 window.SURCO = {
   /* --- Contacto y redes --- */
   whatsapp: "573332485064",                                   // número de pedidos (sin +)
+  whatsappDisplay: "(+57) 333 2485064",                       // texto legible que se muestra en la página
   email: "surcocoffeealmadefinca@gmail.com",
   instagram: "https://instagram.com/surcocoffee",
   facebook: "https://www.facebook.com/profile.php?id=61585849805519",
