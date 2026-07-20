@@ -5,3 +5,9 @@ Thumbs.db
 # Carpetas de imágenes originales full-res (se optimizan a assets/img/)
 /Imagenes hero/
 /Imagen Seccion Receta/
+
+# Artefactos de trabajo (no forman parte del sitio)
+/.superpowers/
+/.playwright-mcp/
+/surco-full.jpeg
+docs
