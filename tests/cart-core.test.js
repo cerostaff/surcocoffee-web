@@ -1,9 +1,9 @@
-import { test } from 'node:test';
-import assert from 'node:assert/strict';
-import {
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const {
   formatCOP, lineTotal, cartTotal, cartCount,
   addItem, changeQty, buildOrderMessage, waLink,
-} from '../js/cart-core.js';
+} = require('../js/cart-core.js');
 
 const P = { id: 'tradicional', nombre: 'Proceso Tradicional', precios: { '250': 25000, '500': 45000 } };
 const S250 = { id: '250', etiqueta: 'Ritual Diario', peso: '250 g' };
@@ -69,9 +69,10 @@ test('cartTotal y cartCount suman correctamente', () => {
 test('buildOrderMessage arma el texto del pedido', () => {
   let cart = addItem([], mkProd(P, S250), S250);
   const msg = buildOrderMessage(cart);
-  assert.match(msg, /^Hola Surco Coffee/);
+  assert.match(msg, /Hola, Surco Coffee/);
   assert.match(msg, /• Proceso Tradicional — Ritual Diario \(250 g\) x1 = \$25\.000/);
   assert.match(msg, /Total: \$25\.000/);
+  assert.match(msg, /pago/);
 });
 
 test('waLink codifica el mensaje', () => {

@@ -66,7 +66,7 @@ window.SURCO = {
       imagen: null,                                           // placeholder hasta tener la foto
       badge: "Edición especial",
       ficha: { variedad: "Chiroso", altura: "1.800–2.200", proceso: "Lavado", sca: "86+" },
-      precios: { "250": 40000, "500": 75000, "1000": 140000, "2500": 300000 },
+      precios: { "250": 40000, "500": 75000, "1000": 145000, "2500": 320000 },
     },
   ],
 };

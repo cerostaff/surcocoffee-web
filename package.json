@@ -2,7 +2,6 @@
   "name": "surcocoffee-web",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "description": "Sitio web estatico de Surco Coffee",
   "scripts": {
     "test": "node --test"
