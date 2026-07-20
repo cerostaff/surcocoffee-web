@@ -10,6 +10,8 @@ Thumbs.db
 /.superpowers/
 /.playwright-mcp/
 /surco-full.jpeg
+/docs/
+/tests/
 
 # Imágenes fuente sueltas (originales sin optimizar); solo se versiona assets/img/
 /assets/*.png
