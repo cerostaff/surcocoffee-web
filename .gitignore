@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+# Carpetas de imágenes originales full-res (se optimizan a assets/img/)
+/Imagenes hero/
+/Imagen Seccion Receta/
