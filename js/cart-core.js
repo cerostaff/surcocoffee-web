@@ -50,12 +50,15 @@
       .filter((x) => x.qty > 0);
   }
 
-  function buildOrderMessage(cart) {
+  function buildOrderMessage(cart, textos) {
+    const t = textos || {};
+    const intro = t.intro || '¡Hola, Surco Coffee! 🌱\n\nMe encantaría llevar este pedido:';
+    const totalLabel = t.total || 'Total';
+    const outro = t.outro || '¿Me confirman disponibilidad y cómo puedo realizar el pago? ¡Mil gracias! ☕';
     const lines = cart
       .map((x) => `• ${x.prod} — ${x.sizeName} (${x.sizeWeight}) x${x.qty} = ${formatCOP(lineTotal(x))}`)
       .join('\n');
-    const total = cartTotal(cart);
-    return `¡Hola, Surco Coffee! 🌱\n\nMe encantaría llevar este pedido:\n\n${lines}\n\nTotal: ${formatCOP(total)}\n\n¿Me confirman disponibilidad y cómo puedo realizar el pago? ¡Mil gracias! ☕`;
+    return `${intro}\n\n${lines}\n\n${totalLabel}: ${formatCOP(cartTotal(cart))}\n\n${outro}`;
   }
 
   function waLink(phone, message) {

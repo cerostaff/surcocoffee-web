@@ -19,7 +19,14 @@ Para cambiar **fotos**: sube la imagen a `assets/img/` y pon su nombre en
 `config.js` (o reemplaza el archivo existente con el mismo nombre).
 
 Los textos largos de las secciones "Fórmula Secreta" y "¿Por qué elegirnos?"
-están en `index.html` (busca el texto y edítalo).
+están en `index.html` (busca el texto y edítalo); al editarlos, actualiza también
+su versión en inglés en `js/i18n.js`.
+
+- **Idiomas (Español / English):** el español es el contenido de `js/config.js` e
+  `index.html`; las traducciones al inglés están en **`js/i18n.js`**. El visitante
+  cambia de idioma con las banderas (arriba a la derecha).
+- **Encuadre de una foto de producto:** en `js/config.js`, campo opcional
+  `imagenPos` (ej. `"center 68%"`) para ajustar qué parte de la foto se ve.
 
 ## Estructura
 

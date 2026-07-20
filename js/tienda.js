@@ -8,6 +8,29 @@
   const CFG = window.SURCO;
   const $ = (id) => document.getElementById(id);
 
+  // ============ IDIOMA (i18n) ============
+  const TX = window.TEXTOS || { es: { ui: {}, pedido: {} } };
+  let lang = 'es';
+  try { const saved = localStorage.getItem('surco-lang'); if (saved === 'en' || saved === 'es') lang = saved; } catch (e) {}
+  // Texto de interfaz por clave
+  const tr = (k) => (TX[lang] && TX[lang].ui[k]) || (TX.es.ui[k]) || '';
+  // Contenido de producto localizado (el español vive en config.js; inglés en i18n.js)
+  function locProd(p) {
+    const ov = lang !== 'es' && TX[lang] && TX[lang].productos && TX[lang].productos[p.id];
+    return {
+      nombre: (ov && ov.nombre) || p.nombre,
+      descripcion: (ov && ov.descripcion) || p.descripcion,
+    };
+  }
+  function locProceso(v) {
+    const map = lang !== 'es' && TX[lang] && TX[lang].proceso;
+    return (map && map[v]) || v;
+  }
+  function locSize(s) {
+    const ov = lang !== 'es' && TX[lang] && TX[lang].tamanos && TX[lang].tamanos[s.id];
+    return { id: s.id, peso: s.peso, etiqueta: (ov && ov.etiqueta) || s.etiqueta, nota: (ov && ov.nota) || s.nota };
+  }
+
   // --- Estado ---
   const state = {
     cart: [],
@@ -29,20 +52,24 @@
     const price = p.precios[sizes[sel].id] ?? 0;
 
     const media = p.imagen
-      ? `<img src="${p.imagen}" alt="Bolsa Surco ${p.titulo}" style="width:100%; height:100%; object-fit:cover;">`
-      : `<div style="width:100%; height:100%; display:grid; place-content:center; text-align:center; padding:16px; color:color-mix(in srgb, var(--color-text) 55%, transparent); font-size:13px; background:var(--color-accent-2-100);">Foto de ${p.titulo}<br>(próximamente)</div>`;
+      ? `<img src="${p.imagen}" alt="Bolsa Surco ${p.titulo}" style="width:100%; height:100%; object-fit:cover; object-position:${p.imagenPos || 'center'};">`
+      : `<div style="width:100%; height:100%; display:grid; place-content:center; text-align:center; padding:16px; color:color-mix(in srgb, var(--color-text) 55%, transparent); font-size:13px; background:var(--color-accent-2-100);">${tr('card.fotoDe')} ${p.titulo}<br>${tr('card.proximamente')}</div>`;
     const badge = p.badge
       ? `<span style="position:absolute; top:10px; left:10px; z-index:2; font-family:var(--font-heading); font-size:12px; padding:5px 12px; border-radius:999px; background:var(--color-accent); color:#fff;">${p.badge}</span>`
       : '';
 
-    const chips = sizes.map((s, i) => `
+    const chips = sizes.map((s, i) => {
+      const ls = locSize(s);
+      return `
       <button type="button" data-add-size data-prod="${p.id}" data-size="${i}"
         style="cursor:pointer; text-align:left; padding:8px 12px; border-radius:14px; transition:transform .12s ease, background .18s ease; ${i === sel ? chipSel : chipUnsel}">
-        <span style="display:block; font-family:var(--font-heading); font-size:13px; line-height:1.15;">${s.etiqueta}</span>
-        <span style="display:block; font-size:11px; opacity:.8;">${s.peso}</span>
-      </button>`).join('');
+        <span style="display:block; font-family:var(--font-heading); font-size:13px; line-height:1.15;">${ls.etiqueta}</span>
+        <span style="display:block; font-size:11px; opacity:.8;">${ls.peso}</span>
+      </button>`;
+    }).join('');
 
     const f = p.ficha || {};
+    const loc = locProd(p);
     const fichaCell = (label, val) =>
       `<div><div style="font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--color-accent-2-800); margin-bottom:2px;">${label}</div><div style="font-family:var(--font-heading); font-size:15px;">${val || '—'}</div></div>`;
 
@@ -53,16 +80,16 @@
       </figure>
       <div>
         <h3 style="font-family:var(--font-heading); font-weight:400; font-size:22px; margin:10px 0 4px;">${p.titulo}</h3>
-        <p style="font-size:13.5px; line-height:1.5; margin:0; color:color-mix(in srgb, var(--color-text) 66%, transparent);">${p.descripcion}</p>
+        <p style="font-size:13.5px; line-height:1.5; margin:0; color:color-mix(in srgb, var(--color-text) 66%, transparent);">${loc.descripcion}</p>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; padding:14px 0; border-top:1px solid var(--color-divider); border-bottom:1px solid var(--color-divider);">
-        ${fichaCell('Variedad', f.variedad)}${fichaCell('Altura', f.altura)}${fichaCell('Proceso', f.proceso)}${fichaCell('Puntaje SCA', f.sca)}
+        ${fichaCell(tr('card.variedad'), f.variedad)}${fichaCell(tr('card.altura'), f.altura)}${fichaCell(tr('card.proceso'), locProceso(f.proceso))}${fichaCell(tr('card.sca'), f.sca)}
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">${chips}</div>
-      <p style="margin:0; font-size:12.5px; font-style:italic; color:color-mix(in srgb, var(--color-text) 62%, transparent);">${sizes[sel].nota}</p>
+      <p style="margin:0; font-size:12.5px; font-style:italic; color:color-mix(in srgb, var(--color-text) 62%, transparent);">${locSize(sizes[sel]).nota}</p>
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto;">
         <span style="font-family:var(--font-heading); font-size:24px; color:var(--color-accent-700);">${formatCOP(price)}</span>
-        <button type="button" data-add data-prod="${p.id}" class="btn-agregar" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:999px; border:0; background:var(--color-accent-2-600); color:#fff; font-family:var(--font-heading); font-size:14px; transition:transform .12s ease, background .18s ease;">Agregar</button>
+        <button type="button" data-add data-prod="${p.id}" class="btn-agregar" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:999px; border:0; background:var(--color-accent-2-600); color:#fff; font-family:var(--font-heading); font-size:14px; transition:transform .12s ease, background .18s ease;">${tr('card.agregar')}</button>
       </div>
     </div>`;
   }
@@ -111,18 +138,18 @@
     const body = hasItems ? `
       <div style="display:flex; flex-direction:column; gap:11px; max-height:280px; overflow:auto;">${cartItemsHtml()}</div>
       <div style="display:flex; align-items:baseline; justify-content:space-between; margin-top:16px;">
-        <span style="font-size:13px; letter-spacing:0.06em; text-transform:uppercase; color:color-mix(in srgb, var(--color-text) 65%, transparent);">Total</span>
+        <span style="font-size:13px; letter-spacing:0.06em; text-transform:uppercase; color:color-mix(in srgb, var(--color-text) 65%, transparent);">${tr('cart.total')}</span>
         <span style="font-family:var(--font-heading); font-size:26px; color:var(--color-accent-700);">${formatCOP(cartTotal(state.cart))}</span>
       </div>
       <button type="button" id="cart-checkout" style="cursor:pointer; width:100%; margin-top:14px; padding:12px; border-radius:999px; border:0; background:#25d366; color:#fff; font-family:var(--font-heading); font-size:15px; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:transform .12s ease, filter .18s ease;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.7 15L2 22l5.1-1.3A10 10 0 1 0 12 2z"></path></svg>Finalizar por WhatsApp</button>
-      ${state.done ? '<p style="text-align:center; font-size:13px; color:var(--color-accent-2-700); margin:12px 0 0;">Abrimos WhatsApp con tu pedido listo para enviar.</p>' : ''}
-    ` : `<p style="font-size:14px; color:color-mix(in srgb, var(--color-text) 55%, transparent); margin:0;">Aún no has agregado café. Elige un tamaño y toca "Agregar".</p>`;
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.7 15L2 22l5.1-1.3A10 10 0 1 0 12 2z"></path></svg>${tr('cart.finalizar')}</button>
+      ${state.done ? `<p style="text-align:center; font-size:13px; color:var(--color-accent-2-700); margin:12px 0 0;">${tr('cart.hecho')}</p>` : ''}
+    ` : `<p style="font-size:14px; color:color-mix(in srgb, var(--color-text) 55%, transparent); margin:0;">${tr('cart.vacio')}</p>`;
 
     panel.innerHTML = `
       <div class="cart-pop" style="position:absolute; top:calc(100% + 12px); right:0; width:min(370px,86cqw); background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); padding:20px; z-index:60; color:var(--color-text); text-align:left;">
         <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px;">
-          <h3 style="font-family:var(--font-heading); font-weight:400; font-size:20px; margin:0;">Tu pedido</h3>
+          <h3 style="font-family:var(--font-heading); font-weight:400; font-size:20px; margin:0;">${tr('cart.titulo')}</h3>
           <button type="button" id="cart-close" style="cursor:pointer; border:0; background:transparent; color:color-mix(in srgb, var(--color-text) 55%, transparent); font-size:20px; line-height:1;">×</button>
         </div>
         ${body}
@@ -176,8 +203,10 @@
   function onAdd(prodId) {
     const p = CFG.productos.find((x) => x.id === prodId);
     const size = CFG.tamanos[state.sel[prodId]];
-    const withPrice = { ...p, price: p.precios[size.id] ?? 0 };
-    state.cart = addItem(state.cart, withPrice, size);
+    const lp = locProd(p);
+    const ls = locSize(size);
+    const prodForCart = { id: p.id, nombre: lp.nombre, price: p.precios[size.id] ?? 0 };
+    state.cart = addItem(state.cart, prodForCart, ls);
     state.done = false;
     state.cartOpen = true;
     refreshAll();
@@ -188,8 +217,29 @@
   function closeCart() { if (state.cartOpen) { state.cartOpen = false; renderCartPanel(); } }
   function onCheckout() {
     if (!state.cart.length) return;
-    window.open(waLink(CFG.whatsapp, buildOrderMessage(state.cart)), '_blank');
+    const textos = (TX[lang] && TX[lang].pedido) || TX.es.pedido;
+    window.open(waLink(CFG.whatsapp, buildOrderMessage(state.cart, textos)), '_blank');
     state.done = true;
+    renderCartPanel();
+  }
+
+  // ============ APLICAR IDIOMA ============
+  function applyLanguage(l) {
+    lang = (l === 'en') ? 'en' : 'es';
+    try { localStorage.setItem('surco-lang', lang); } catch (e) {}
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
+      const v = tr(el.getAttribute('data-i18n'));
+      if (v) el.innerHTML = v;
+    });
+    document.querySelectorAll('#lang-switch [data-lang]').forEach((b) => {
+      const on = b.getAttribute('data-lang') === lang;
+      b.style.filter = on ? 'none' : 'grayscale(0.7)';
+      b.style.opacity = on ? '1' : '0.5';
+      b.style.transform = on ? 'scale(1.06)' : 'none';
+    });
+    renderCatalogo();
+    renderCartBadge();
     renderCartPanel();
   }
 
@@ -216,9 +266,12 @@
   });
   $('hero-prev').addEventListener('click', () => goSlide(state.slide - 1));
   $('hero-next').addEventListener('click', () => goSlide(state.slide + 1));
+  document.querySelectorAll('#lang-switch [data-lang]').forEach((b) => {
+    b.addEventListener('click', () => applyLanguage(b.getAttribute('data-lang')));
+  });
 
   // ============ INICIO ============
-  refreshAll();
+  applyLanguage(lang);   // pinta textos + catálogo + carrito en el idioma guardado
   renderSlide();
   initContacts();
   initAnimations();

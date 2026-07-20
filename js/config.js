@@ -44,6 +44,7 @@ window.SURCO = {
       nombre: "Proceso Tradicional",
       descripcion: "Chocolate, caramelo y sutiles matices frutales. Acidez brillante, final limpio y persistente.",
       imagen: "assets/img/bag-tradicional.jpg",
+      imagenPos: "center 68%",   // encuadre de la foto (deja ver la base de la bolsa)
       badge: null,
       ficha: { variedad: "Castillo · Caturra", altura: "1.800–2.200", proceso: "Lavado", sca: "84+" },
       precios: { "250": 25000, "500": 45000, "1000": 85000, "2500": 210000 },
